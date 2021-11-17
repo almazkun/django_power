@@ -1,44 +1,26 @@
-# is valid_user
-# is valid_token
-# new_user
-# update_user
-# delete_user
-from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
-from django.contrib.auth.models import User
-
-from django.views import View
+from django.shortcuts import render
+from django.views.generic import TemplateView
 
 
-class UserCreateView(CreateView):
-    model = User
+class HomeView(TemplateView):
+    template_name = "home.html"
+
+
+class UserCreateView(TemplateView):
     template_name = "user_create.html"
-    fields = ["email", "password"]
 
 
-class UserUpdateView(UpdateView):
-    model = User
+class UserUpdateView(TemplateView):
     template_name = "user_update.html"
-    fields = ["password"]
 
 
-class UserDeleteView(DeleteView):
-    model = User
+class UserDeleteView(TemplateView):
     template_name = "user_delete.html"
 
 
-class UserIsValidToken(View):
-    def get(self, request, email):
-        user = User.objects.filter(email=email)
-        if user:
-            return JsonResponse({"valid": True})
-        else:
-            return JsonResponse({"valid": False})
+class UserIsValidToken(TemplateView):
+    template_name = "user_is_valid_token.html"
 
 
-class UserGetToken(View):
-    def get(self, request, email):
-        user = User.objects.filter(email=email)
-        if user:
-            return JsonResponse({"token": user.token})
-        else:
-            return JsonResponse({"token": None})
+class UserGetToken(TemplateView):
+    template_name = "user_get_token.html"

@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+
+
+{% block main_content %}
+    <h1>One simply can:</h1>
+    <ul>
+        <li><a href="{% url 'create_user' %}">Create User</a></li>
+        <li><a href="{% url 'update_user' %}">Update User</a></li>
+        <li><a href="{% url 'delete_user' %}">Delete User</a></li>
+        <li><a href="{% url 'is_valid_token' %}">Validate Token</a></li>
+        <li><a href="{% url 'get_token' %}">Get Token</a></li>
+    </ul>
+{% endblock %}
