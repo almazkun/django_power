@@ -20,12 +20,12 @@
         {% endblock %}
     </head>
 
-    <body class="container" style="max-width: 42em;">
+    <body>
         {% block navigation %}
             {% include 'includes/nav.html' %}
         {% endblock navigation %}
 
-        <div class="py-5">
+        <div class="container my-5 py-5">
             {% block main_content %}
             {% endblock main_content %}
         </div>    
