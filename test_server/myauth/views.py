@@ -8,6 +8,8 @@ from myauth.forms import (
     MyUserDeleteForm,
 )
 
+from myauth.services import validate_token
+
 
 class HomeView(TemplateView):
     template_name = "home.html"
@@ -56,3 +58,17 @@ class UserGetToken(MyFormView):
     template_name = "user_get_token.html"
     form_class = MyAuthenticationForm
     success_message = "Your token: %(token)s"
+
+
+class UserValidateToken(TemplateView):
+    template_name = "user_validate_token.html"
+
+    def get(self, request, *args, **kwargs):
+        token = request.GET.get("token")
+        if token:
+            valid = validate_token(token)
+            if valid:
+                messages.success(request, "Token is valid!")
+            else:
+                messages.error(request, "Token is NOT valid!")
+        return super().get(request, *args, **kwargs)

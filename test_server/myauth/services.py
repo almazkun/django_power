@@ -14,6 +14,9 @@ def validate_email(email: str) -> None:
         raise ValidationError("Email already in use!")
 
 
+def validate_token(token: str) -> bool:
+    return Token.objects.filter(token=token).exists()
+
 def generate_unique_username() -> str:
     while True:
         username = token_urlsafe(150)[:150]
