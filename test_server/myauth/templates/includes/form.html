@@ -1,0 +1,6 @@
+{% if form %}
+    <form method="post">{% csrf_token %}
+        {{ form.as_ul }}
+        <input class="mt-3 btn btn-danger" type="submit" value="Submit">
+    </form>
+{% endif %}

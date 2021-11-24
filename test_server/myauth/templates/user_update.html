@@ -2,11 +2,6 @@
 
 
 {% block main_content %}
-    <h1>One simply can: Update User's password</h1>
-    {% if form %}    
-        <form method="post">{% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="Save">
-        </form>
-    {% endif %}
+    <h1>One simply can: Update User`s password</h1>
+    {% include "includes/form.html" %}
 {% endblock %}

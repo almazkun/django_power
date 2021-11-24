@@ -1,16 +1,16 @@
-from django.test import Client, TestCase
-from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-
-from myauth.models import generate_unique_token
-from myauth.services import generate_unique_username
+from django.test import Client, TestCase
+from django.urls import reverse
 from myauth.forms import (
     MyAuthenticationForm,
     MyPasswordChangeForm,
-    MyUserDeleteForm,
     MyUserCreationForm,
+    MyUserDeleteForm,
 )
+from myauth.models import generate_unique_token
+from myauth.services import generate_unique_username
+
 
 # Create your tests here.
 class TestModels(TestCase):
@@ -47,6 +47,11 @@ class TestViews(TestCase):
         self.assertEqual(user.email, self.post_data.get("email"))
         self.assertTrue(user.check_password(self.post_data.get("password1")))
         self.assertIsNotNone(user.token)
+
+        response = self.client.post(reverse("create_user"), self.post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.context["form"], MyUserCreationForm)
+        self.assertFalse(response.context["form"].is_valid())
 
     def test_user_update_view(self):
         response = self.client.get(reverse("update_user"))

@@ -1,15 +1,13 @@
-from django.urls import reverse_lazy
-from django.shortcuts import render
-from django.views.generic import TemplateView, CreateView, FormView
-from myauth.forms import (
-    MyUserCreationForm,
-    MyPasswordChangeForm,
-    MyUserDeleteForm,
-    MyAuthenticationForm,
-)
-from myauth.services import create_token_for_user
-from django.contrib.auth.models import User
 from django.contrib import messages
+from django.urls import reverse_lazy
+from django.views.generic import FormView, TemplateView
+from myauth.forms import (
+    MyAuthenticationForm,
+    MyPasswordChangeForm,
+    MyUserCreationForm,
+    MyUserDeleteForm,
+)
+
 
 class HomeView(TemplateView):
     template_name = "home.html"
@@ -17,45 +15,44 @@ class HomeView(TemplateView):
 
 class MyFormView(FormView):
     success_url = reverse_lazy("home_user")
-    success_context = dict()
-    msg = None
+    success_message = ""
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["success"] = self.success_context
-        return context
-    
     def form_valid(self, form):
+        response = super().form_valid(form)
         user = form.save()
-        messages.success(self.request, f'Success: {user.email}')
-        return super().form_valid(form)
+        success_message = self.get_success_message(user)
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
+
+    def get_success_message(self, user) -> str:
+        if user is None:
+            return self.success_message
+        return self.success_message % {
+            "email": user.email,
+            "token": user.token.token,
+        }
 
 
 class UserCreateView(MyFormView):
     template_name = "user_create.html"
     form_class = MyUserCreationForm
-    msg = messages.success
+    success_message = "New User created: %(email)s!"
 
 
 class UserUpdateView(MyFormView):
     template_name = "user_update.html"
     form_class = MyPasswordChangeForm
-    msg = messages.info
+    success_message = "Password updated: %(email)s!"
 
 
 class UserDeleteView(MyFormView):
     template_name = "user_delete.html"
     form_class = MyUserDeleteForm
-    msg = messages.warning
+    success_message = "User deleted!"
 
 
 class UserGetToken(MyFormView):
     template_name = "user_get_token.html"
     form_class = MyAuthenticationForm
-    success_url = reverse_lazy("get_user_token")
-
-    def form_valid(self, form):
-        user = form.save(commit=False)
-        self.success_context["token"] = user.token.token
-        return super().form_valid(form)
-
+    success_message = "Your token: %(token)s"

@@ -2,19 +2,11 @@
 
 
 {% block main_content %}
-    {% if messages %}
-        <ul class="messages p-3">
-            {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
     <h1>One simply can:</h1>
-    <ul>
-        <li><a href="{% url 'create_user' %}">Create User</a></li>
-        <li><a href="{% url 'update_user' %}">Update User</a></li>
-        <li><a href="{% url 'delete_user' %}">Delete User</a></li>
-        <li><a href="{% url 'get_user_token' %}">Get Token</a></li>
+    <ul class="list-group">
+        <li class="list-group-item"><a href="{% url 'create_user' %}">Create User</a></li>
+        <li class="list-group-item"><a href="{% url 'update_user' %}">Update User</a></li>
+        <li class="list-group-item"><a href="{% url 'delete_user' %}">Delete User</a></li>
+        <li class="list-group-item"><a href="{% url 'get_user_token' %}">Get Token</a></li>
     </ul>
 {% endblock %}

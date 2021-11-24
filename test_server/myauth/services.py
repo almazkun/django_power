@@ -1,19 +1,20 @@
-from myauth.models import Token
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from secrets import token_urlsafe
+
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from myauth.models import Token
 
 
 def create_token_for_user(user: User) -> Token:
     return Token.objects.create(user=user)
 
 
-def validate_email(email):
+def validate_email(email: str) -> None:
     if User.objects.filter(email=email).exists():
         raise ValidationError("Email already in use!")
 
 
-def generate_unique_username():
+def generate_unique_username() -> str:
     while True:
         username = token_urlsafe(150)[:150]
         if not User.objects.filter(username=username).exists():

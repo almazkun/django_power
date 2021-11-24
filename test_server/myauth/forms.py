@@ -1,13 +1,11 @@
-from django.contrib.auth.forms import UserCreationForm
-from myauth.services import (
-    validate_email,
-    create_token_for_user,
-    get_user_by_email_and_pass,
-)
-from myauth.services import generate_unique_username
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.password_validation import validate_password
-from django.core import validators
+from myauth.services import (
+    generate_unique_username,
+    get_user_by_email_and_pass,
+    validate_email,
+)
 
 
 class MyUserCreationForm(UserCreationForm):
@@ -30,7 +28,8 @@ class MyUserCreationForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data["email"]
-        user.save()
+        if commit:
+            user.save()
         return super().save()
 
 
@@ -38,16 +37,18 @@ class MyAuthenticationForm(forms.Form):
     email = forms.EmailField(label="Email", max_length=254)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = None
+
     def clean(self):
-        self.user_ = get_user_by_email_and_pass(
+        self.user = get_user_by_email_and_pass(
             self.cleaned_data.get("email"), self.cleaned_data.get("password")
         )
         return super().clean()
 
     def save(self, commit=True):
-        if commit:
-            self.user_.save()
-        return self.user_
+        return self.user
 
 
 class MyPasswordChangeForm(MyAuthenticationForm):
@@ -58,7 +59,8 @@ class MyPasswordChangeForm(MyAuthenticationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["new_password"])
-        user.save()
+        if commit:
+            user.save()
         return user
 
 
@@ -66,5 +68,4 @@ class MyUserDeleteForm(MyAuthenticationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.delete()
-        return user
-
+        return None

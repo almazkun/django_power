@@ -1,11 +1,13 @@
-from django.db import models
-from django.contrib.auth.models import User
 from secrets import token_urlsafe
+
+from django.contrib.auth.models import User
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 # Create your models here.
-def generate_unique_token():
+def generate_unique_token() -> str:
     while True:
         token = token_urlsafe(256)[:255]
         if not Token.objects.filter(token=token).exists():
@@ -19,6 +21,6 @@ class Token(models.Model):
 
 
 @receiver(post_save, sender=User)
-def create_token(sender, instance, created, **kwargs):
+def create_token(sender, instance, created, **kwargs) -> None:
     if created:
         Token.objects.create(user=instance)
