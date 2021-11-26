@@ -1,4 +1,4 @@
-from rest_framework import APIView
+from rest_framework.views import APIView
 from api.serializers import TokenSerializer
 
 
