@@ -15,8 +15,10 @@ def generate_unique_token() -> str:
 
 
 class Token(models.Model):
+    token = models.CharField(
+        max_length=255, default=generate_unique_token, primary_key=True
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="token")
-    token = models.CharField(max_length=255, default=generate_unique_token)
     created = models.DateTimeField(auto_now_add=True)
 
 

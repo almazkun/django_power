@@ -5,10 +5,6 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from myauth.models import Token
 
 
-def create_token_for_user(user: User) -> Token:
-    return Token.objects.create(user=user)
-
-
 def validate_email(email: str) -> None:
     if User.objects.filter(email=email).exists():
         raise ValidationError("Email already in use!")

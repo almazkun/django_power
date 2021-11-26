@@ -8,6 +8,7 @@ from myauth.forms import (
     MyUserCreationForm,
     MyUserDeleteForm,
 )
+from myauth.views import UserCreateView
 from myauth.models import generate_unique_token
 from myauth.services import generate_unique_username
 
@@ -19,11 +20,6 @@ class TestModels(TestCase):
 
         self.assertEqual(len(token), 255)
 
-    def test_generate_unique_username(self):
-        username = generate_unique_username()
-
-        self.assertEqual(len(username), 150)
-
 
 class TestViews(TestCase):
     def setUp(self):
@@ -34,7 +30,7 @@ class TestViews(TestCase):
             "password2": "asdasdasd123",
         }
 
-    def test_user_create_view_get(self):
+    def test_user_create_view(self):
         response = self.client.get(reverse("create_user"))
 
         self.assertEqual(response.status_code, 200)
@@ -102,6 +98,47 @@ class TestViews(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.context["form"], MyAuthenticationForm)
 
+        self.client.post(reverse("create_user"), self.post_data)
+        user = User.objects.get(email=self.post_data.get("email"))
+
+        response = self.client.post(
+            reverse("get_user_token"),
+            {
+                "email": self.post_data.get("email"),
+                "password": self.post_data.get("password1"),
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+    def test_validate_token(self):
+        self.client.post(reverse("create_user"), self.post_data)
+        user = User.objects.get(email=self.post_data.get("email"))
+
+        response = self.client.get(
+            reverse("validate_user_token"), data={"token": user.token.token}
+        )
+        self.assertTrue(
+            any(
+                [
+                    "Token is valid!" in message.message
+                    for message in response.context["messages"]
+                ]
+            )
+        )
+
+        response = self.client.get(
+            reverse("validate_user_token"), data={"token": "user.token.token"}
+        )
+        self.assertTrue(
+            any(
+                [
+                    "Token is NOT valid!" in message.message
+                    for message in response.context["messages"]
+                ]
+            )
+        )
+
 
 class TestForms(TestCase):
     def test_my_authentication_form(self):
@@ -126,3 +163,10 @@ class TestForms(TestCase):
         self.assertFalse(form.is_valid())
         with self.assertRaises(ValidationError):
             form.clean()
+
+
+class TestServices(TestCase):
+    def test_generate_unique_username(self):
+        username = generate_unique_username()
+
+        self.assertEqual(len(username), 150)

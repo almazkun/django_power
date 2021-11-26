@@ -23,6 +23,7 @@ class MyFormView(FormView):
         response = super().form_valid(form)
         user = form.save()
         success_message = self.get_success_message(user)
+
         if success_message:
             messages.success(self.request, success_message)
         return response
